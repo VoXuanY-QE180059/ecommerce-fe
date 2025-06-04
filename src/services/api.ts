@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/products'; 
+const API_URL = 'https://ecommerce-be-eta.vercel.app/products'; 
 
 export const getProducts = async (page: number = 1, limit: number = 10) => {
   const response = await axios.get(`${API_URL}/list`, { params: { page, limit } });

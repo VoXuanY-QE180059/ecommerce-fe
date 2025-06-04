@@ -1,13 +1,13 @@
 import { Eye, Edit3, Trash2 } from 'lucide-react';
 import type { Product } from '../types/product.ts';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://ecommerce-be-eta.vercel.app';
 
 interface ProductCardProps {
   product: Product;
   navigateTo: (page: string, product?: Product) => void;
   confirmDelete: (product: Product) => void;
-  viewMode: 'grid' | 'list'; // Thêm prop viewMode
+  viewMode: 'grid' | 'list'; 
 }
 
 export default function ProductCard({ product, navigateTo, confirmDelete, viewMode }: ProductCardProps) {

@@ -1,7 +1,7 @@
 import { ArrowLeft, Edit3, Trash2 } from 'lucide-react';
 import type { Product } from '../types/product.ts';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://ecommerce-be-eta.vercel.app';
 
 interface ProductDetailProps {
   product: Product;
