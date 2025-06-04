@@ -3,7 +3,7 @@ import { ArrowLeft, Upload, X, Check } from 'lucide-react';
 import type { ProductFormData } from '../types/product.ts';
 import { createProduct, updateProduct } from '../services/api';
 
-const API_URL = 'https://ecommerce-be-eta.vercel.app';
+const API_URL = 'https://ecommerce-be-p4qj.onrender.com';
 
 interface ProductFormProps {
   formData: ProductFormData;
