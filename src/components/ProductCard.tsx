@@ -1,3 +1,4 @@
+import React from 'react';
 import { Eye, Edit3, Trash2 } from 'lucide-react';
 import type { Product } from '../types/product.ts';
 
@@ -7,10 +8,11 @@ interface ProductCardProps {
   product: Product;
   navigateTo: (page: string, product?: Product) => void;
   confirmDelete: (product: Product) => void;
-  viewMode: 'grid' | 'list'; 
+  viewMode: 'grid' | 'list';
+  isLoggedIn: boolean;
 }
 
-export default function ProductCard({ product, navigateTo, confirmDelete, viewMode }: ProductCardProps) {
+export default function ProductCard({ product, navigateTo, confirmDelete, viewMode, isLoggedIn }: ProductCardProps) {
   const getImageSrc = () => {
     if (product.image instanceof File) {
       return URL.createObjectURL(product.image);
@@ -53,6 +55,8 @@ export default function ProductCard({ product, navigateTo, confirmDelete, viewMo
           <span className="text-base font-medium text-black">₫{product.price.toFixed(2)}</span>
           <span className="text-xs text-gray-500">Tồn kho: {product.stock}</span>
         </div>
+
+        {/* Action Buttons */}
         <div className="flex space-x-2">
           <button
             onClick={() => navigateTo('detail', product)}
@@ -62,20 +66,25 @@ export default function ProductCard({ product, navigateTo, confirmDelete, viewMo
             <Eye size={14} />
             <span className="text-xs font-medium">Xem</span>
           </button>
-          <button
-            onClick={() => navigateTo('form', product)}
-            className="bg-gray-200 hover:bg-gray-300 text-black px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-sm"
-            aria-label="Chỉnh sửa sản phẩm"
-          >
-            <Edit3 size={14} />
-          </button>
-          <button
-            onClick={() => confirmDelete(product)}
-            className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-sm"
-            aria-label="Xóa sản phẩm"
-          >
-            <Trash2 size={14} />
-          </button>
+
+          {isLoggedIn && (
+            <>
+              <button
+                onClick={() => navigateTo('form', product)}
+                className="bg-gray-200 hover:bg-gray-300 text-black px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-sm"
+                aria-label="Chỉnh sửa sản phẩm"
+              >
+                <Edit3 size={14} />
+              </button>
+              <button
+                onClick={() => confirmDelete(product)}
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-sm"
+                aria-label="Xóa sản phẩm"
+              >
+                <Trash2 size={14} />
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

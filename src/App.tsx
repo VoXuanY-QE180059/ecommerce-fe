@@ -6,11 +6,13 @@ import ProductForm from './components/ProductForm';
 import DeleteModal from './components/DeleteModal';
 import type { Product, ProductFormData } from './types/product.ts';
 import { deleteProduct } from './services/api';
+import React from 'react';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formData, setFormData] = useState<ProductFormData>({
     id: '',
     name: '',
@@ -88,6 +90,7 @@ export default function App() {
           setProducts={setProducts}
           navigateTo={navigateTo}
           confirmDelete={confirmDelete}
+          isLoggedIn={isLoggedIn}
         />
       )}
       {currentPage === 'detail' && selectedProduct && (
@@ -95,6 +98,7 @@ export default function App() {
           product={selectedProduct}
           navigateTo={navigateTo}
           confirmDelete={confirmDelete}
+          isLoggedIn={isLoggedIn}
         />
       )}
       {currentPage === 'form' && (

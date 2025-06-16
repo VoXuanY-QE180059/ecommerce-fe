@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, Upload, X, Check } from 'lucide-react';
 import type { ProductFormData } from '../types/product.ts';
 import { createProduct, updateProduct } from '../services/api';
-
+import React from 'react';
 const API_URL = 'https://ecommerce-be-p4qj.onrender.com';
 
 interface ProductFormProps {

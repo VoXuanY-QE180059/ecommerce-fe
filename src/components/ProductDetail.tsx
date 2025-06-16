@@ -1,5 +1,6 @@
 import { ArrowLeft, Edit3, Trash2 } from 'lucide-react';
 import type { Product } from '../types/product.ts';
+import React from 'react';
 
 const API_URL = 'https://ecommerce-be-p4qj.onrender.com';
 
@@ -7,9 +8,15 @@ interface ProductDetailProps {
   product: Product;
   navigateTo: (page: string, product?: Product) => void;
   confirmDelete: (product: Product) => void;
+  isLoggedIn: boolean; // ✅ Thêm dòng này
 }
 
-export default function ProductDetail({ product, navigateTo, confirmDelete }: ProductDetailProps) {
+export default function ProductDetail({
+  product,
+  navigateTo,
+  confirmDelete,
+  isLoggedIn, // ✅ Thêm dòng này
+}: ProductDetailProps) {
   const getImageSrc = () => {
     if (product.image instanceof File) {
       return URL.createObjectURL(product.image);
@@ -75,24 +82,40 @@ export default function ProductDetail({ product, navigateTo, confirmDelete }: Pr
                 <span className="text-black text-sm font-medium">#{product.id}</span>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
-              <button
-                onClick={() => navigateTo('form', product)}
-                className="flex-1 bg-green-400 hover:bg-green-500 text-black px-5 py-2.5 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 hover:shadow-sm"
-                aria-label="Chỉnh sửa sản phẩm"
-              >
-                <Edit3 size={18} />
-                <span className="font-medium text-sm">Chỉnh sửa</span>
-              </button>
-              <button
-                onClick={() => confirmDelete(product)}
-                className="flex-1 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 hover:shadow-sm"
-                aria-label="Xóa sản phẩm"
-              >
-                <Trash2 size={18} />
-                <span className="font-medium text-sm">Xóa</span>
-              </button>
-            </div>
+
+            {/* ✅ Điều kiện isLoggedIn */}
+            {isLoggedIn ? (
+              <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
+                <button
+                  onClick={() => navigateTo('form', product)}
+                  className="flex-1 bg-green-400 hover:bg-green-500 text-black px-5 py-2.5 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 hover:shadow-sm"
+                  aria-label="Chỉnh sửa sản phẩm"
+                >
+                  <Edit3 size={18} />
+                  <span className="font-medium text-sm">Chỉnh sửa</span>
+                </button>
+                <button
+                  onClick={() => confirmDelete(product)}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 hover:shadow-sm"
+                  aria-label="Xóa sản phẩm"
+                >
+                  <Trash2 size={18} />
+                  <span className="font-medium text-sm">Xóa</span>
+                </button>
+              </div>
+            ) : (
+              <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 text-center mt-4">
+                <p className="text-gray-600 text-sm">
+                  <button
+                    onClick={() => navigateTo('login')}
+                    className="text-green-500 hover:underline transition-colors duration-150 font-medium"
+                  >
+                    Đăng nhập
+                  </button>{' '}
+                  để quản lý sản phẩm này.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
