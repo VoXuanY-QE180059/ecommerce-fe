@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const API_URL = 'https://product-manage-1gs3.onrender.com/auth';
+const API_URL = 'https://ecommerce-be-p4qj.onrender.com';
 
 interface JWTPayload {
   email: string;

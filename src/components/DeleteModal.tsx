@@ -1,5 +1,5 @@
 import type { Product } from '../types/product.ts';
-
+import React from 'react';
 interface DeleteModalProps {
   show: boolean;
   product: Product | null;
