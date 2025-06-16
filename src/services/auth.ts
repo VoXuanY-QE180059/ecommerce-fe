@@ -55,47 +55,40 @@ const decodeJWT = (token: string): JWTPayload => {
 };
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
-    try {
-      const response = await axios.post(`${API_URL}/login`, data);
-      
-      if (response.data?.data?.token) {
-        const token = response.data.data.token;
-        setToken(token);
-        const payload = decodeJWT(token);
-        
-        return {
-          token: token,
-          user: {
-            email: payload.email,
-            role: payload.role
-          }
-        };
-      }
-      throw new Error('Invalid response format');
-    } catch (error: any) {
-      if (error.response?.data?.error?.message) {
-        throw new Error(error.response.data.error.message);
-      }
-      throw new Error(error.response?.data?.message || 'Login failed');
+  try {
+    const response = await axios.post(`${API_URL}/login`, data);
+    
+    if (response.data?.data?.token) {
+      setToken(response.data.data.token);
     }
-  };
-  
-  export const register = async (data: RegisterData): Promise<AuthResponse> => {
-    try {
-      const response = await axios.post(`${API_URL}/register`, data);
-      
-      if (response.data?.data) {
-        // Sau khi register thành công, tự động login
-        return login(data);
+    
+    const payload = decodeJWT(response.data.data.token);
+    
+    return {
+      token: response.data.data.token,
+      user: {
+        email: payload.email,
+        role: payload.role
       }
-      throw new Error('Invalid response format');
-    } catch (error: any) {
-      if (error.response?.data?.error?.message) {
-        throw new Error(error.response.data.error.message);
-      }
-      throw new Error(error.response?.data?.message || 'Registration failed');
+    };
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Login failed');
+  }
+};
+
+export const register = async (data: RegisterData): Promise<AuthResponse> => {
+  try {
+    const response = await axios.post(`${API_URL}/register`, data);
+    
+    if (response.data.token) {
+      setToken(response.data.token);
     }
-  };
+    
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Registration failed');
+  }
+};
 
 export const logout = (): void => {
   removeToken();
