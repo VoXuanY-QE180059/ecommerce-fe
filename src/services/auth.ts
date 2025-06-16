@@ -56,50 +56,36 @@ const decodeJWT = (token: string): JWTPayload => {
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
   try {
-    console.log('Login request data:', data);
     const response = await axios.post(`${API_URL}/login`, data);
-    console.log('Login response:', response.data);
     
-    if (response.data?.token) {
-      setToken(response.data.token);
+    if (response.data?.data?.token) {
+      setToken(response.data.data.token);
     }
     
-    const payload = decodeJWT(response.data.token);
+    const payload = decodeJWT(response.data.data.token);
     
     return {
-      token: response.data.token,
+      token: response.data.data.token,
       user: {
         email: payload.email,
         role: payload.role
       }
     };
   } catch (error: any) {
-    console.error('Login error:', error.response?.data);
     throw new Error(error.response?.data?.message || 'Login failed');
   }
 };
 
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
   try {
-    console.log('Register request data:', data);
     const response = await axios.post(`${API_URL}/register`, data);
-    console.log('Register response:', response.data);
     
-    if (response.data?.token) {
+    if (response.data.token) {
       setToken(response.data.token);
     }
     
-    const payload = decodeJWT(response.data.token);
-    
-    return {
-      token: response.data.token,
-      user: {
-        email: payload.email,
-        role: payload.role
-      }
-    };
+    return response.data;
   } catch (error: any) {
-    console.error('Register error:', error.response?.data);
     throw new Error(error.response?.data?.message || 'Registration failed');
   }
 };
