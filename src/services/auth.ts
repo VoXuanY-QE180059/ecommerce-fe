@@ -72,6 +72,7 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
       }
     };
   } catch (error: any) {
+    console.error("Login API Error Response:", error.response);
     throw new Error(error.response?.data?.message || 'Login failed');
   }
 };
