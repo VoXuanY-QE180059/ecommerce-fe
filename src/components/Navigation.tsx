@@ -6,10 +6,11 @@ import React from 'react';
 interface NavigationProps {
   currentPage: string;
   navigateTo: (page: string) => void;
-  onAuthChange?: () => void;
+  isLoggedIn: boolean;
+  onAuthChange: () => void;
 }
 
-export default function Navigation({ currentPage, navigateTo, onAuthChange }: NavigationProps) {
+export default function Navigation({ currentPage, navigateTo, isLoggedIn, onAuthChange }: NavigationProps) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const loggedIn = isAuthenticated();
   const currentUser = getCurrentUser();

@@ -10,9 +10,10 @@ interface ProductFormProps {
   setFormData: (data: ProductFormData) => void;
   isEditing: boolean;
   navigateTo: (page: string) => void;
+  onSuccess: () => void;
 }
 
-export default function ProductForm({ formData, setFormData, isEditing, navigateTo }: ProductFormProps) {
+export default function ProductForm({ formData, setFormData, isEditing, navigateTo, onSuccess }: ProductFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -72,6 +73,7 @@ export default function ProductForm({ formData, setFormData, isEditing, navigate
         await createProduct(data);
       }
       navigateTo('home');
+      onSuccess();
     } catch (err: any) {
       console.error('Error creating/updating product:', err.response?.data || err.message);
       setError(err.response?.data?.error?.message || err.message || 'Đã xảy ra lỗi');
