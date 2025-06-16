@@ -8,20 +8,6 @@ interface LoginPageProps {
   onAuthSuccess: () => void;
 }
 
-// Giả lập hàm login để component có thể chạy độc lập
-// XÓA BỎ HÀM NÀY KHI TÍCH HỢP VÀO DỰ ÁN CỦA BẠN
-// const login = (formData: any) => {
-//   return new Promise((resolve, reject) => {
-//     setTimeout(() => {
-//       if (formData.email === "test@example.com" && formData.password === "password") {
-//         resolve({ message: "Login successful" });
-//       } else {
-//         reject(new Error("Invalid email or password."));
-//       }
-//     }, 1500);
-//   });
-// };
-
 export default function LoginPage({ navigateTo, onAuthSuccess }: LoginPageProps) {
   const [formData, setFormData] = useState({
     email: '',

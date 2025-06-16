@@ -28,8 +28,7 @@ export default function HomePage({
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        // Giả lập độ trễ mạng để thấy trạng thái loading
-        // await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const data = await getProducts();
         setProducts(data.data);
         setError(null);

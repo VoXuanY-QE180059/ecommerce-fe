@@ -9,20 +9,6 @@ interface RegisterPageProps {
   isLoggedIn: boolean;
 }
 
-// Giả lập hàm register để component có thể chạy độc lập
-// XÓA BỎ HÀM NÀY KHI TÍCH HỢP VÀO DỰ ÁN CỦA BẠN
-// const register = (data: any) => {
-//   return new Promise((resolve, reject) => {
-//     setTimeout(() => {
-//       if (data.email.includes("test")) {
-//         reject(new Error("Email is already taken."));
-//       } else {
-//         resolve({ message: "Registration successful" });
-//       }
-//     }, 1500);
-//   });
-// };
-
 export default function RegisterPage({ navigateTo, onAuthSuccess, isLoggedIn }: RegisterPageProps) {
   useEffect(() => {
     if (isLoggedIn) {

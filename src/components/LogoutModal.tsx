@@ -14,7 +14,7 @@ export default function LogoutModal({ show, onConfirm, onCancel }: LogoutModalPr
     if (show) {
       setShouldRender(true);
     } else {
-      // Delay unmounting for the exit animation to complete
+      
       const timer = setTimeout(() => setShouldRender(false), 300);
       return () => clearTimeout(timer);
     }
