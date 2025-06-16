@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Mail, Lock, UserPlus, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { register } from '../services/auth';
+import { register } from '../services/auth'; // Giả sử bạn có file này
 import React from 'react';
 
 interface RegisterPageProps {
@@ -8,6 +8,20 @@ interface RegisterPageProps {
   onAuthSuccess: () => void;
   isLoggedIn: boolean;
 }
+
+// Giả lập hàm register để component có thể chạy độc lập
+// XÓA BỎ HÀM NÀY KHI TÍCH HỢP VÀO DỰ ÁN CỦA BẠN
+// const register = (data: any) => {
+//   return new Promise((resolve, reject) => {
+//     setTimeout(() => {
+//       if (data.email.includes("test")) {
+//         reject(new Error("Email is already taken."));
+//       } else {
+//         resolve({ message: "Registration successful" });
+//       }
+//     }, 1500);
+//   });
+// };
 
 export default function RegisterPage({ navigateTo, onAuthSuccess, isLoggedIn }: RegisterPageProps) {
   useEffect(() => {
@@ -38,25 +52,30 @@ export default function RegisterPage({ navigateTo, onAuthSuccess, isLoggedIn }: 
 
   const validatePassword = (password: string) => {
     const rules = [
-      { test: password.length >= 6, message: 'At least 6 characters long' },
-      { test: /[A-Z]/.test(password), message: 'At least 1 uppercase letter' },
-      { test: /[a-z]/.test(password), message: 'At least 1 lowercase letter' },
-      { test: /((?=.*\d)|(?=.*\W+))/.test(password), message: 'At least 1 number or special character' }
+      { test: password.length >= 6, message: 'Ít nhất 6 ký tự' },
+      { test: /[A-Z]/.test(password), message: 'Ít nhất 1 chữ hoa' },
+      { test: /[a-z]/.test(password), message: 'Ít nhất 1 chữ thường' },
+      { test: /[\d\W]/.test(password), message: 'Ít nhất 1 số hoặc ký tự đặc biệt' }
     ];
     return rules;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Mật khẩu xác nhận không khớp.');
+      return;
+    }
+     const isPasswordValid = validatePassword(formData.password).every(rule => rule.test);
+    if (!isPasswordValid) {
+        setError('Mật khẩu không đáp ứng đủ các yêu cầu.');
+        return;
+    }
+
     setLoading(true);
     setError('');
     setSuccess(false);
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
 
     try {
       await register({
@@ -68,214 +87,138 @@ export default function RegisterPage({ navigateTo, onAuthSuccess, isLoggedIn }: 
         onAuthSuccess();
       }, 1500);
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.');
+      setError(err.message || 'Đăng ký thất bại. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
   };
 
   const passwordRules = validatePassword(formData.password);
+  const passwordsMatch = formData.password && formData.confirmPassword && formData.password === formData.confirmPassword;
+  const canSubmit = passwordsMatch && passwordRules.every(rule => rule.test) && !loading && !success;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
-      <div className="bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md p-8 relative overflow-hidden">
-        {/* Loading Overlay */}
-        {loading && (
-          <div className="absolute inset-0 bg-gray-800/90 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative">
-                <div className="w-16 h-16 border-4 border-gray-600 rounded-full animate-spin"></div>
-                <div className="absolute top-0 left-0 w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-              </div>
-              <p className="text-gray-300 font-medium">Creating your account...</p>
-            </div>
-          </div>
-        )}
-
-        {/* Success Overlay */}
-        {success && (
-          <div className="absolute inset-0 bg-gray-800/90 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="relative">
-                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-8 h-8 text-green-400 animate-pulse" />
-                </div>
-                <div className="absolute -inset-2 border-2 border-green-400/50 rounded-full animate-ping"></div>
-              </div>
-              <div>
-                <p className="text-green-400 font-bold text-lg">Account Created!</p>
-                <p className="text-gray-300 text-sm">Welcome to our platform...</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="text-center mb-8">
-          <div className="bg-indigo-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <UserPlus className="w-8 h-8 text-indigo-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-          <p className="text-gray-400">Sign up for a new account</p>
-        </div>
-
-        {error && (
-          <div className="bg-red-900/50 border border-red-700 rounded-lg p-4 mb-6 flex items-center space-x-2 animate-shake">
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-            <span className="text-red-300 text-sm">{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-              Email Address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-500" />
-              </div>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                disabled={loading || success}
-                className="block w-full pl-10 pr-3 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 placeholder-gray-400"
-                placeholder="Enter your email"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-500" />
-              </div>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                disabled={loading || success}
-                className="block w-full pl-10 pr-12 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 placeholder-gray-400"
-                placeholder="Create a password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={loading || success}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center disabled:opacity-50"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-500 hover:text-gray-400 transition-colors" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-500 hover:text-gray-400 transition-colors" />
-                )}
-              </button>
-            </div>
-            
-            {formData.password && (
-              <div className="mt-2 space-y-1">
-                {passwordRules.map((rule, index) => (
-                  <div key={index} className="flex items-center space-x-2 text-xs">
-                    {rule.test ? (
-                      <CheckCircle className="w-3 h-3 text-green-500" />
-                    ) : (
-                      <div className="w-3 h-3 rounded-full border border-gray-300" />
-                    )}
-                    <span className={rule.test ? 'text-green-600' : 'text-gray-500'}>
-                      {rule.message}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
-              Confirm Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-500" />
-              </div>
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                required
-                disabled={loading || success}
-                className="block w-full pl-10 pr-12 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 placeholder-gray-400"
-                placeholder="Confirm your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                disabled={loading || success}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center disabled:opacity-50"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-500 hover:text-gray-400 transition-colors" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-500 hover:text-gray-400 transition-colors" />
-                )}
-              </button>
-            </div>
-            {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-              <p className="mt-1 text-xs text-red-400 animate-pulse">Passwords do not match</p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading || success || formData.password !== formData.confirmPassword}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+    <div className="min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070&auto=format&fit=crop')" }}>
+      <div className="min-h-screen bg-black/60 flex items-center justify-center p-4">
+        <div className="relative w-full max-w-md">
+          {/* Lớp phủ cho trạng thái Loading và Success */}
+           <div 
+            className={`absolute inset-0 bg-white/10 backdrop-blur-md rounded-2xl z-20 transition-opacity duration-500 flex items-center justify-center
+            ${loading || success ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           >
-            {loading ? (
-              <div className="flex items-center justify-center space-x-2">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Creating account...</span>
+            {loading && (
+              <div className="flex flex-col items-center gap-4 text-center">
+                <Loader2 className="w-10 h-10 text-white animate-spin" />
+                <div className="text-white">
+                  <p className="font-semibold text-lg">Đang tạo tài khoản...</p>
+                  <p className="text-sm text-white/70">Chỉ một lát nữa thôi!</p>
+                </div>
               </div>
-            ) : success ? (
-              <div className="flex items-center justify-center space-x-2">
-                <CheckCircle className="w-5 h-5" />
-                <span>Account Created!</span>
-              </div>
-            ) : (
-              'Create Account'
             )}
-          </button>
-        </form>
+            {success && (
+               <div className="flex flex-col items-center gap-4 text-center">
+                <div className="relative">
+                  <CheckCircle className="w-12 h-12 text-green-400" />
+                   <div className="absolute -inset-2 border-2 border-green-400/50 rounded-full animate-ping"></div>
+                </div>
+                <div className="text-white">
+                  <p className="font-semibold text-lg text-green-400">Tạo tài khoản thành công!</p>
+                  <p className="text-sm text-white/70">Chào mừng bạn đến với chúng tôi...</p>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Form đăng ký */}
+          <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-2xl p-8 transform transition-all duration-500">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-white tracking-wider">Register</h1>
+              <p className="text-white/60 mt-2">Tạo tài khoản mới của bạn</p>
+            </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-gray-300 text-sm sm:text-base">
-            Already have an account?{' '}
-            <button
-              onClick={() => navigateTo('login')}
-              disabled={loading || success}
-              className="text-indigo-400 font-medium hover:text-indigo-300 hover:underline transition-colors duration-200"
-            >
-              Sign in
-            </button>
-          </p>
+            {error && (
+              <div className="bg-red-500/30 border border-red-500/50 rounded-lg p-3 mb-6 flex items-center gap-3 animate-shake">
+                <AlertCircle className="w-5 h-5 text-red-300 flex-shrink-0" />
+                <span className="text-white text-sm font-medium">{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
+                <input
+                  type="email" name="email" value={formData.email} onChange={handleInputChange} required disabled={loading || success}
+                  className="w-full bg-white/10 border-2 border-transparent text-white rounded-lg pl-12 pr-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors duration-300 placeholder:text-white/40"
+                  placeholder="Email của bạn"
+                />
+              </div>
+
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
+                <input
+                  type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleInputChange} required disabled={loading || success}
+                  className="w-full bg-white/10 border-2 border-transparent text-white rounded-lg pl-12 pr-12 py-3 focus:outline-none focus:border-indigo-500 transition-colors duration-300 placeholder:text-white/40"
+                  placeholder="Tạo mật khẩu"
+                />
+                 <button type="button" onClick={() => setShowPassword(!showPassword)} disabled={loading || success} className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white/70 transition-colors">
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+                
+              {/* Password validation UI */}
+              {formData.password && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 p-2 rounded-md">
+                  {passwordRules.map((rule, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <CheckCircle className={`w-4 h-4 transition-colors ${rule.test ? 'text-green-400' : 'text-white/30'}`} />
+                      <span className={`text-xs transition-colors ${rule.test ? 'text-white/90' : 'text-white/50'}`}>{rule.message}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleInputChange} required disabled={loading || success}
+                  className="w-full bg-white/10 border-2 border-transparent text-white rounded-lg pl-12 pr-12 py-3 focus:outline-none focus:border-indigo-500 transition-colors duration-300 placeholder:text-white/40"
+                  placeholder="Xác nhận mật khẩu"
+                />
+                 <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} disabled={loading || success} className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white/70 transition-colors">
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+               {formData.confirmPassword && !passwordsMatch && (
+                  <div className="flex items-center gap-2 text-xs text-red-400 pl-2">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>Mật khẩu không khớp</span>
+                  </div>
+                )}
+              
+              <div className="pt-4">
+                <button type="submit" disabled={!canSubmit} className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-black/20 disabled:opacity-50 disabled:bg-gray-500/50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-100 flex items-center justify-center gap-2">
+                  <UserPlus className="w-5 h-5" />
+                  <span>Create Account</span>
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-8 text-center">
+              <p className="text-white/60 text-sm">
+                Đã có tài khoản?{' '}
+                <button onClick={() => navigateTo('login')} disabled={loading || success} className="text-indigo-400 font-semibold hover:text-indigo-300 hover:underline transition-colors duration-200">
+                  Đăng nhập
+                </button>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
+       <style jsx>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+          20%, 40%, 60%, 80% { transform: translateX(4px); }
         }
         .animate-shake {
           animation: shake 0.5s ease-in-out;

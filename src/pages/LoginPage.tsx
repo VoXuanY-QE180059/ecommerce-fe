@@ -1,11 +1,26 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, LogIn, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { login } from '../services/auth';
+import { login } from '../services/auth'; // Giả sử bạn có file này
 import React from 'react';
+
 interface LoginPageProps {
   navigateTo: (page: string) => void;
-  onAuthSuccess: () => void; 
+  onAuthSuccess: () => void;
 }
+
+// Giả lập hàm login để component có thể chạy độc lập
+// XÓA BỎ HÀM NÀY KHI TÍCH HỢP VÀO DỰ ÁN CỦA BẠN
+// const login = (formData: any) => {
+//   return new Promise((resolve, reject) => {
+//     setTimeout(() => {
+//       if (formData.email === "test@example.com" && formData.password === "password") {
+//         resolve({ message: "Login successful" });
+//       } else {
+//         reject(new Error("Invalid email or password."));
+//       }
+//     }, 1500);
+//   });
+// };
 
 export default function LoginPage({ navigateTo, onAuthSuccess }: LoginPageProps) {
   const [formData, setFormData] = useState({
@@ -46,151 +61,119 @@ export default function LoginPage({ navigateTo, onAuthSuccess }: LoginPageProps)
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
-      <div className="bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md p-8 relative overflow-hidden">
-        {/* Loading Overlay */}
-        {loading && (
-          <div className="absolute inset-0 bg-gray-800/90 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative">
-                <div className="w-16 h-16 border-4 border-gray-600 rounded-full animate-spin"></div>
-                <div className="absolute top-0 left-0 w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-              </div>
-              <p className="text-gray-300 font-medium">Signing you in...</p>
-            </div>
-          </div>
-        )}
-
-        {/* Success Overlay */}
-        {success && (
-          <div className="absolute inset-0 bg-gray-800/90 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="relative">
-                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-8 h-8 text-green-400 animate-pulse" />
-                </div>
-                <div className="absolute -inset-2 border-2 border-green-400/50 rounded-full animate-ping"></div>
-              </div>
-              <div>
-                <p className="text-green-400 font-bold text-lg">Login Successful!</p>
-                <p className="text-gray-300 text-sm">Redirecting to dashboard...</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="text-center mb-8">
-          <div className="bg-indigo-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <LogIn className="w-8 h-8 text-indigo-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-gray-400">Sign in to your account</p>
-        </div>
-
-        {error && (
-          <div className="bg-red-900/50 border border-red-700 rounded-lg p-4 mb-6 flex items-center space-x-2 animate-shake">
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-            <span className="text-red-300 text-sm">{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-              Email Address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-500" />
-              </div>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                disabled={loading || success}
-                className="block w-full pl-10 pr-3 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 placeholder-gray-400"
-                placeholder="Enter your email"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-500" />
-              </div>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                disabled={loading || success}
-                className="block w-full pl-10 pr-12 py-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 placeholder-gray-400"
-                placeholder="Enter your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={loading || success}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center disabled:opacity-50"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-500 hover:text-gray-400 transition-colors" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-500 hover:text-gray-400 transition-colors" />
-                )}
-              </button>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading || success}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+    <div className="min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?q=80&w=2071&auto=format&fit=crop')" }}>
+      <div className="min-h-screen bg-black/50 flex items-center justify-center p-4">
+        
+        <div className="relative w-full max-w-sm">
+          {/* Lớp phủ cho trạng thái Loading và Success */}
+          <div 
+            className={`absolute inset-0 bg-white/10 backdrop-blur-md rounded-2xl z-20 transition-opacity duration-500 flex items-center justify-center
+            ${loading || success ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           >
-            {loading ? (
-              <div className="flex items-center justify-center space-x-2">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Signing in...</span>
+            {loading && (
+              <div className="flex flex-col items-center gap-4 text-center">
+                <Loader2 className="w-10 h-10 text-white animate-spin" />
+                <div className="text-white">
+                  <p className="font-semibold text-lg">Đang đăng nhập...</p>
+                  <p className="text-sm text-white/70">Vui lòng chờ trong giây lát.</p>
+                </div>
               </div>
-            ) : success ? (
-              <div className="flex items-center justify-center space-x-2">
-                <CheckCircle className="w-5 h-5" />
-                <span>Success!</span>
-              </div>
-            ) : (
-              'Sign In'
             )}
-          </button>
-        </form>
+            {success && (
+               <div className="flex flex-col items-center gap-4 text-center">
+                <div className="relative">
+                  <CheckCircle className="w-12 h-12 text-green-400" />
+                   <div className="absolute -inset-2 border-2 border-green-400/50 rounded-full animate-ping"></div>
+                </div>
+                <div className="text-white">
+                  <p className="font-semibold text-lg text-green-400">Đăng nhập thành công!</p>
+                  <p className="text-sm text-white/70">Đang chuyển hướng đến trang chính...</p>
+                </div>
+              </div>
+            )}
+          </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-gray-300 text-sm sm:text-base">
-            Don't have an account?{' '}
-            <button
-              onClick={() => navigateTo('register')}
-              disabled={loading || success}
-              className="text-indigo-400 font-medium hover:text-indigo-300 hover:underline transition-colors duration-200"
-            >
-              Sign up
-            </button>
-          </p>
+          {/* Form đăng nhập */}
+          <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-2xl p-8 transform transition-all duration-500">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-white tracking-wider">Login</h1>
+              <p className="text-white/60 mt-2">Chào mừng bạn đã trở lại!</p>
+            </div>
+
+            {error && (
+              <div className="bg-red-500/30 border border-red-500/50 rounded-lg p-3 mb-6 flex items-center gap-3 animate-shake">
+                <AlertCircle className="w-5 h-5 text-red-300 flex-shrink-0" />
+                <span className="text-white text-sm font-medium">{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  disabled={loading || success}
+                  className="w-full bg-white/10 border-2 border-transparent text-white rounded-lg pl-12 pr-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors duration-300 placeholder:text-white/40"
+                  placeholder="Email của bạn"
+                />
+              </div>
+
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  disabled={loading || success}
+                  className="w-full bg-white/10 border-2 border-transparent text-white rounded-lg pl-12 pr-12 py-3 focus:outline-none focus:border-indigo-500 transition-colors duration-300 placeholder:text-white/40"
+                  placeholder="Mật khẩu"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading || success}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white/70 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || success}
+                className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-black/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-100 flex items-center justify-center gap-2"
+              >
+                <LogIn className="w-5 h-5" />
+                <span>Sign In</span>
+              </button>
+            </form>
+
+            <div className="mt-8 text-center">
+              <p className="text-white/60 text-sm">
+                Chưa có tài khoản?{' '}
+                <button
+                  onClick={() => navigateTo('register')}
+                  disabled={loading || success}
+                  className="text-indigo-400 font-semibold hover:text-indigo-300 hover:underline transition-colors duration-200"
+                >
+                  Đăng ký ngay
+                </button>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
+       <style jsx>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+          20%, 40%, 60%, 80% { transform: translateX(4px); }
         }
         .animate-shake {
           animation: shake 0.5s ease-in-out;
