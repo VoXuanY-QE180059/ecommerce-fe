@@ -1,61 +1,71 @@
-import { LogOut } from "lucide-react";
-import React from 'react';
+import { LogOut, ShieldAlert } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+
 interface LogoutModalProps {
   show: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-export default function LogoutModal({
-  show,
-  onConfirm,
-  onCancel,
-}: LogoutModalProps) {
-  if (!show) return null;
+export default function LogoutModal({ show, onConfirm, onCancel }: LogoutModalProps) {
+  const [shouldRender, setShouldRender] = useState(show);
+
+  useEffect(() => {
+    if (show) {
+      setShouldRender(true);
+    } else {
+      // Delay unmounting for the exit animation to complete
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [show]);
+
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 transition-all duration-300">
-      <div className="bg-slate-800 rounded-xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform transition-all duration-300 scale-100 border border-slate-700 hover:border-orange-500/50">
+    <div
+      className={`fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 ${show ? 'opacity-100' : 'opacity-0'}`}
+      onClick={onCancel} // Close modal on backdrop click
+    >
+      <div
+        className={`bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-2xl w-full max-w-sm m-4 p-8 transform transition-all duration-300
+                    ${show ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}`}
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+      >
         {/* Icon and Title */}
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="w-12 h-12 bg-orange-500/20 rounded-full flex items-center justify-center">
-            <LogOut size={24} className="text-orange-400" />
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-red-500/20 border-2 border-red-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <LogOut size={32} className="text-red-400" />
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            Confirm Logout
+          <h3 className="text-2xl font-bold text-white tracking-tight">
+            Xác nhận Đăng xuất
           </h3>
         </div>
 
         {/* Warning Message */}
-        <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 mb-6">
-          <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-            Are you sure you want to{" "}
-            <span className="font-semibold text-orange-400">
-              log out
-            </span>{" "}
-            of your account?
-          </p>
-          <p className="text-orange-300 text-sm mt-2 font-medium">
-            💡 You'll need to sign in again to access your account.
-          </p>
-        </div>
+        <p className="text-white/70 text-center text-base leading-relaxed mb-8">
+          Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không? Bạn sẽ cần đăng nhập lại để tiếp tục.
+        </p>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row-reverse gap-4">
+          {/* Confirm Button (Primary Action, styled red for warning) */}
           <button
             onClick={onConfirm}
-            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] font-medium"
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105 active:scale-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black/20 font-semibold"
             aria-label="Confirm logout"
           >
             <LogOut size={18} />
-            <span>Logout</span>
+            <span>Đăng xuất</span>
           </button>
+          
+          {/* Cancel Button (Secondary Action) */}
           <button
             onClick={onCancel}
-            className="flex-1 bg-slate-700 hover:bg-slate-600 border border-slate-600 hover:border-slate-500 text-gray-300 hover:text-white px-4 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] font-medium"
+            className="flex-1 bg-white/10 hover:bg-white/20 border border-transparent text-white/80 hover:text-white px-4 py-3 rounded-lg transition-colors duration-300 font-medium"
             aria-label="Cancel logout"
           >
-            Stay Signed In
+            Ở lại
           </button>
         </div>
       </div>
