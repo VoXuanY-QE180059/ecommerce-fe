@@ -1,16 +1,26 @@
 import { useState } from 'react';
-import { Home, Plus, LogIn, UserPlus, LogOut, User } from 'lucide-react';
+import { Home, Plus, LogIn, UserPlus, LogOut, User, ShoppingCart, Package } from 'lucide-react';
 import { isAuthenticated, getCurrentUser, logout } from '../services/auth';
 import LogoutModal from './LogoutModal';
 import React from 'react';
+
 interface NavigationProps {
   currentPage: string;
   navigateTo: (page: string) => void;
   isLoggedIn: boolean;
   onAuthChange: () => void;
+  cartItemsCount?: number;
+  onCartOpen?: () => void;
 }
 
-export default function Navigation({ currentPage, navigateTo, isLoggedIn, onAuthChange }: NavigationProps) {
+export default function Navigation({ 
+  currentPage, 
+  navigateTo, 
+  isLoggedIn, 
+  onAuthChange,
+  cartItemsCount = 0,
+  onCartOpen
+}: NavigationProps) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const loggedIn = isAuthenticated();
   const currentUser = getCurrentUser();
@@ -50,6 +60,35 @@ export default function Navigation({ currentPage, navigateTo, isLoggedIn, onAuth
               <Home size={18} />
               <span className="hidden sm:inline text-sm font-medium">Trang chủ</span>
             </button>
+
+            {/* Giỏ hàng */}
+            <button
+              onClick={onCartOpen}
+              className="relative flex items-center space-x-1 px-3 py-2 rounded-lg transition-all duration-200 hover:bg-gray-100"
+              aria-label="Mở giỏ hàng"
+            >
+              <ShoppingCart size={18} />
+              <span className="hidden sm:inline text-sm font-medium">Giỏ hàng</span>
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartItemsCount > 99 ? '99+' : cartItemsCount}
+                </span>
+              )}
+            </button>
+
+            {/* Đơn hàng - Chỉ khi đăng nhập */}
+            {loggedIn && (
+              <button
+                onClick={() => navigateTo('orders')}
+                className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-all duration-200 ${
+                  currentPage === 'orders' ? 'bg-green-400 text-black' : 'hover:bg-gray-100'
+                }`}
+                aria-label="Xem đơn hàng"
+              >
+                <Package size={18} />
+                <span className="hidden sm:inline text-sm font-medium">Đơn hàng</span>
+              </button>
+            )}
 
             {/* Thêm sản phẩm - Chỉ khi đăng nhập */}
             {loggedIn && (

@@ -11,6 +11,7 @@ interface HomePageProps {
   navigateTo: (page: string, product?: Product) => void;
   confirmDelete: (product: Product) => void;
   isLoggedIn: boolean;
+  onAddToCart?: (product: Product, quantity?: number) => void;
 }
 
 export default function HomePage({
@@ -19,6 +20,7 @@ export default function HomePage({
   navigateTo,
   confirmDelete,
   isLoggedIn,
+  onAddToCart,
 }: HomePageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,6 +100,7 @@ export default function HomePage({
             confirmDelete={confirmDelete}
             viewMode={viewMode}
             isLoggedIn={isLoggedIn}
+            onAddToCart={onAddToCart}
           />
         ))}
       </div>

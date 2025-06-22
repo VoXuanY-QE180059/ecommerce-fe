@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Edit3, Trash2 } from 'lucide-react';
+import { Eye, Edit3, Trash2, ShoppingCart } from 'lucide-react';
 import type { Product } from '../types/product.ts';
 
 const API_URL = 'https://ecommerce-be-p4qj.onrender.com';
@@ -10,9 +10,17 @@ interface ProductCardProps {
   confirmDelete: (product: Product) => void;
   viewMode: 'grid' | 'list';
   isLoggedIn: boolean;
+  onAddToCart?: (product: Product, quantity?: number) => void;
 }
 
-export default function ProductCard({ product, navigateTo, confirmDelete, viewMode, isLoggedIn }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  navigateTo,
+  confirmDelete,
+  viewMode,
+  isLoggedIn,
+  onAddToCart
+}: ProductCardProps) {
   const getImageSrc = () => {
     if (product.image instanceof File) {
       return URL.createObjectURL(product.image);
@@ -21,6 +29,12 @@ export default function ProductCard({ product, navigateTo, confirmDelete, viewMo
       return `${API_URL}${product.image}`;
     }
     return null;
+  };
+
+  const handleAddToCart = () => {
+    if (onAddToCart && product.stock > 0) {
+      onAddToCart(product, 1);
+    }
   };
 
   return (
@@ -66,6 +80,25 @@ export default function ProductCard({ product, navigateTo, confirmDelete, viewMo
             <Eye size={14} />
             <span className="text-xs font-medium">Xem</span>
           </button>
+
+          {/* Add to Cart Button */}
+          {onAddToCart && (
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock === 0 || !product.isActive}
+              className={`flex-1 px-3 py-2 rounded-lg flex items-center justify-center space-x-1 transition-all duration-200 hover:shadow-sm ${
+                product.stock === 0 || !product.isActive
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+              aria-label="Thêm vào giỏ hàng"
+            >
+              <ShoppingCart size={14} />
+              <span className="text-xs font-medium">
+                {product.stock === 0 ? 'Hết hàng' : 'Thêm'}
+              </span>
+            </button>
+          )}
 
           {isLoggedIn && (
             <>

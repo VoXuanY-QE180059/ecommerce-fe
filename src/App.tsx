@@ -3,12 +3,15 @@ import Navigation from './components/Navigation';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import OrderPage from './pages/OrderPage';
 import ProductDetail from './components/ProductDetail';
 import ProductForm from './components/ProductForm';
 import DeleteModal from './components/DeleteModal';
+import CartModal from './components/CartModal';
 import type { Product, ProductFormData } from './types/product';
 import { deleteProduct } from './services/api';
 import { isAuthenticated } from './services/auth';
+import { useCart } from './context/CartContext';
 import React from 'react';
 
 export default function App() {
@@ -29,6 +32,10 @@ export default function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Use cart context
+  const { cartItems, addToCart, getTotalItems } = useCart();
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
@@ -113,6 +120,34 @@ export default function App() {
     }
   };
 
+  const handleAddToCart = (product: Product, quantity: number = 1) => {
+    addToCart(product, quantity);
+    alert(`Đã thêm ${product.name} vào giỏ hàng!`);
+  };
+
+  const openCart = () => {
+    setIsCartOpen(true);
+  };
+
+  const closeCart = () => {
+    setIsCartOpen(false);
+  };
+
+  const handleProceedToOrder = () => {
+    if (!isLoggedIn) {
+      alert('Bạn cần đăng nhập để đặt hàng');
+      navigateTo('login');
+      return;
+    }
+    
+    if (cartItems.length === 0) {
+      alert('Giỏ hàng trống!');
+      return;
+    }
+    
+    navigateTo('order');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation
@@ -120,6 +155,8 @@ export default function App() {
         navigateTo={navigateTo}
         isLoggedIn={isLoggedIn}
         onAuthChange={handleAuthChange}
+        cartItemsCount={getTotalItems()}
+        onCartOpen={openCart}
       />
 
       {currentPage === 'home' && (
@@ -129,6 +166,7 @@ export default function App() {
           navigateTo={navigateTo}
           confirmDelete={confirmDelete}
           isLoggedIn={isLoggedIn}
+          onAddToCart={handleAddToCart}
         />
       )}
 
@@ -144,6 +182,12 @@ export default function App() {
           navigateTo={navigateTo}
           onAuthSuccess={handleAuthSuccess}
           isLoggedIn={isLoggedIn}
+        />
+      )}
+
+      {currentPage === 'order' && (
+        <OrderPage
+          navigateTo={navigateTo}
         />
       )}
 
@@ -171,6 +215,12 @@ export default function App() {
         product={productToDelete}
         onConfirm={handleDelete}
         onCancel={() => setShowDeleteModal(false)}
+      />
+
+      <CartModal
+        isOpen={isCartOpen}
+        onClose={closeCart}
+        onProceedToOrder={handleProceedToOrder}
       />
     </div>
   );

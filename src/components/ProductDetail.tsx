@@ -1,6 +1,6 @@
-import { ArrowLeft, Edit3, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Edit3, Trash2, ShoppingCart, Plus, Minus } from 'lucide-react';
 import type { Product } from '../types/product.ts';
-import React from 'react';
 
 const API_URL = 'https://ecommerce-be-p4qj.onrender.com';
 
@@ -8,15 +8,19 @@ interface ProductDetailProps {
   product: Product;
   navigateTo: (page: string, product?: Product) => void;
   confirmDelete: (product: Product) => void;
-  isLoggedIn: boolean; // ✅ Thêm dòng này
+  isLoggedIn: boolean;
+  onAddToCart?: (product: Product, quantity?: number) => void;
 }
 
 export default function ProductDetail({
   product,
   navigateTo,
   confirmDelete,
-  isLoggedIn, // ✅ Thêm dòng này
+  isLoggedIn,
+  onAddToCart,
 }: ProductDetailProps) {
+  const [quantity, setQuantity] = useState(1);
+
   const getImageSrc = () => {
     if (product.image instanceof File) {
       return URL.createObjectURL(product.image);
@@ -25,6 +29,19 @@ export default function ProductDetail({
       return `${API_URL}${product.image}`;
     }
     return null;
+  };
+
+  const handleQuantityChange = (change: number) => {
+    const newQuantity = quantity + change;
+    if (newQuantity >= 1 && newQuantity <= product.stock) {
+      setQuantity(newQuantity);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (onAddToCart && product.stock > 0 && quantity > 0) {
+      onAddToCart(product, quantity);
+    }
   };
 
   return (
@@ -83,7 +100,58 @@ export default function ProductDetail({
               </div>
             </div>
 
-            {/* ✅ Điều kiện isLoggedIn */}
+            {/* Add to Cart Section */}
+            {onAddToCart && (
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-medium text-gray-700">Số lượng:</span>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => handleQuantityChange(-1)}
+                      disabled={quantity <= 1}
+                      className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-200"
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="w-12 text-center font-medium">{quantity}</span>
+                    <button
+                      onClick={() => handleQuantityChange(1)}
+                      disabled={quantity >= product.stock}
+                      className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-200"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0 || !product.isActive}
+                  className={`w-full py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 font-medium ${
+                    product.stock === 0 || !product.isActive
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white hover:shadow-md'
+                  }`}
+                >
+                  <ShoppingCart size={18} />
+                  <span>
+                    {product.stock === 0 
+                      ? 'Hết hàng' 
+                      : !product.isActive 
+                      ? 'Sản phẩm không khả dụng'
+                      : `Thêm vào giỏ hàng (${quantity})`}
+                  </span>
+                </button>
+                {product.stock > 0 && product.isActive && (
+                  <div className="mt-2 text-center">
+                    <span className="text-sm text-gray-600">
+                      Tổng: ₫{(product.price * quantity).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Admin Actions */}
             {isLoggedIn ? (
               <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
                 <button
