@@ -58,7 +58,7 @@ export default function CartModal({
         aria-hidden="true"
       />
 
-      {/* Modal content */}
+      {/* Modal content, */}
       <div className="fixed inset-0 z-50 flex items-center justify-center pt-16 p-4">
         <div
           className={`
