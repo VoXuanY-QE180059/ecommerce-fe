@@ -3,21 +3,24 @@ import { getAuthHeaders } from './auth';
 
 const API_URL = 'https://ecommerce-be-p4qj.onrender.com/orders';
 
+// Interface cho sản phẩm trong đơn hàng
 export interface OrderProduct {
-  productId: number;
+  productId: string;  // Chỉ nhận string
   quantity: number;
   price: number;
 }
 
+// Interface cho dữ liệu tạo đơn hàng
 export interface CreateOrderData {
   products: OrderProduct[];
   totalAmount: number;
   shippingAddress: string;
   phoneNumber: string;
   notes?: string;
-  status: 'pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled';
+  status?: 'pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled';
 }
 
+// Interface cho đơn hàng trả về
 export interface Order {
   id: string;
   userId: string;
@@ -31,16 +34,24 @@ export interface Order {
   updatedAt: string;
 }
 
+// Hàm tạo request đã xác thực
 const createAuthenticatedRequest = () => {
   return axios.create({
     headers: getAuthHeaders(),
   });
 };
 
+// API tạo đơn hàng (đã cập nhật xử lý kiểu dữ liệu)
 export const createOrder = async (orderData: CreateOrderData) => {
   try {
+    // Chuyển đổi dữ liệu theo yêu cầu BE
+    const payload = {
+      ...orderData,
+      status: orderData.status || 'pending',
+    };
+
     const authenticatedAxios = createAuthenticatedRequest();
-    const response = await authenticatedAxios.post(`${API_URL}/create`, orderData);
+    const response = await authenticatedAxios.post(`${API_URL}/create`, payload);
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
@@ -50,6 +61,7 @@ export const createOrder = async (orderData: CreateOrderData) => {
   }
 };
 
+// Các API khác giữ nguyên
 export const getOrders = async (page: number = 1, limit: number = 10) => {
   try {
     const authenticatedAxios = createAuthenticatedRequest();

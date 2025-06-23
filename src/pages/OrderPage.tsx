@@ -60,7 +60,8 @@ export default function OrderPage({ navigateTo }: OrderPageProps) {
     try {
       const orderData: CreateOrderData = {
         products: cartItems.map(item => ({
-          productId: item.product.id,
+          // FIX: Convert productId to string
+          productId: item.product.id.toString(),
           quantity: item.quantity,
           price: item.product.price
         })),
