@@ -115,63 +115,43 @@ export default function HomePage({
         <div className="min-h-screen bg-black/70 backdrop-blur-sm pt-24 pb-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
-                <header className="mb-10">
-                    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                                        <Package className="w-5 h-5 text-white" />
-                                    </div>
-                                    <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent tracking-tight">
-                                        Danh sách Sản phẩm
-                                    </h1>
-                                </div>
-                                <p className="text-white/70 text-base sm:text-lg leading-relaxed max-w-2xl">
-                                    Quản lý kho hàng của bạn một cách trực quan và hiệu quả.
-                                </p>
-                            </div>
+                <header className="mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h1 className="text-4xl font-bold text-white tracking-tight">Danh sách Sản phẩm</h1>
+                        <p className="mt-2 text-white/60 text-lg">
+                            Quản lý kho hàng của bạn một cách trực quan và hiệu quả.
+                        </p>
+                    </div>
 
-                            {isLoggedIn && (
-                                <div className="flex items-center gap-4 flex-shrink-0">
-                                    <button
-                                        onClick={() => navigateTo('form')}
-                                        className="group relative bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-all duration-300 transform hover:scale-105 active:scale-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-transparent font-semibold shadow-lg hover:shadow-xl"
-                                    >
-                                        <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                        <Plus size={18} className="relative z-10" />
-                                        <span className="relative z-10">Thêm mới</span>
-                                    </button>
-                                    
-                                    {/* View Mode Toggle */}
-                                    <div className="bg-white/10 backdrop-blur-sm p-1.5 rounded-xl flex items-center gap-1 border border-white/20 shadow-lg">
-                                        <button
-                                            onClick={() => setViewMode('grid')}
-                                            className={`relative px-3 py-2 rounded-lg transition-all duration-300 ${
-                                                viewMode === 'grid' 
-                                                    ? 'bg-white/20 text-white shadow-md' 
-                                                    : 'text-white/60 hover:text-white hover:bg-white/10'
-                                            }`}
-                                            aria-label="Chế độ lưới"
-                                        >
-                                            <LayoutGrid size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => setViewMode('list')}
-                                            className={`relative px-3 py-2 rounded-lg transition-all duration-300 ${
-                                                viewMode === 'list' 
-                                                    ? 'bg-white/20 text-white shadow-md' 
-                                                    : 'text-white/60 hover:text-white hover:bg-white/10'
-                                            }`}
-                                            aria-label="Chế độ danh sách"
-                                        >
-                                            <List size={18} />
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+                    {isLoggedIn && (
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                        <button
+                            onClick={() => navigateTo('form')}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 active:scale-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-black/20 font-semibold shadow-lg"
+                        >
+                            <Plus size={18} />
+                            <span>Thêm mới</span>
+                        </button>
+                        
+                        {/* View Mode Toggle */}
+                        <div className="bg-white/10 p-1 rounded-lg flex items-center gap-1">
+                             <button
+                                onClick={() => setViewMode('grid')}
+                                className={`px-3 py-1.5 rounded-md transition-colors duration-300 ${viewMode === 'grid' ? 'bg-white/20 text-white' : 'text-white/50 hover:bg-white/20'}`}
+                                aria-label="Chế độ lưới"
+                            >
+                                <LayoutGrid size={20} />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`px-3 py-1.5 rounded-md transition-colors duration-300 ${viewMode === 'list' ? 'bg-white/20 text-white' : 'text-white/50 hover:bg-white/20'}`}
+                                aria-label="Chế độ danh sách"
+                            >
+                                <List size={20} />
+                            </button>
                         </div>
                     </div>
+                    )}
                 </header>
 
                 {/* Main Content Area */}
