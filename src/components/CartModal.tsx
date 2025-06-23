@@ -38,17 +38,20 @@ export default function CartModal({ isOpen, onClose, onProceedToOrder }: CartMod
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop với opacity chuẩn */}
+      {/* Backdrop với blur effect và opacity trong suốt */}
       <div 
-        className="absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-all duration-300"
+        style={{ backdropFilter: 'blur(4px)' }}
         onClick={onClose}
       />
       
-      {/* Modal với animation và responsive */}
+      {/* Modal với animation fade-in từ dưới lên */}
       <div className={`
-        relative bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] 
+        relative bg-white rounded-lg shadow-2xl 
+        w-full max-w-[70vw] max-h-[80vh] 
+        sm:max-w-lg md:max-w-xl
         transform transition-all duration-300 ease-out
-        ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-4'}
+        ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-5 scale-95'}
         flex flex-col overflow-hidden
       `}>
         {/* Header */}
@@ -149,40 +152,41 @@ export default function CartModal({ isOpen, onClose, onProceedToOrder }: CartMod
                 </span>
               </div>
               
-              {/* Checkout Button - Luôn hiển thị */}
+              {/* Checkout Button - Luôn hiển thị với design nhất quán */}
               <button
                 onClick={handleCheckout}
-                className={`
-                  w-full py-3 px-4 rounded-lg font-medium transition-all duration-300 
+                className="w-full py-3 px-4 rounded-lg font-semibold text-white
+                  bg-gradient-to-r from-blue-600 to-blue-700 
+                  hover:from-blue-700 hover:to-blue-800
+                  active:from-blue-800 active:to-blue-900
+                  shadow-lg hover:shadow-xl 
+                  transform hover:-translate-y-0.5 active:translate-y-0
+                  transition-all duration-200 ease-out
                   flex items-center justify-center space-x-2
-                  ${isLoggedIn
-                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
-                    : 'bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5'
-                  }
-                `}
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 <CreditCard className="w-5 h-5" />
-                <span>
-                  {isLoggedIn ? 'Thanh toán ngay' : 'Đăng nhập để thanh toán'}
-                </span>
+                <span>Thanh toán</span>
               </button>
               
-              {/* Thông báo trạng thái đăng nhập */}
-              {!isLoggedIn && (
-                <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded-md">
-                  <p className="text-xs text-center text-orange-700">
-                    💡 Bạn cần đăng nhập để thực hiện thanh toán
-                  </p>
-                </div>
-              )}
-              
-              {isLoggedIn && (
-                <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-md">
-                  <p className="text-xs text-center text-green-700">
-                    ✅ Sẵn sàng thanh toán
-                  </p>
-                </div>
-              )}
+              {/* Thông báo trạng thái - Luôn hiển thị */}
+              <div className={`
+                mt-3 p-3 rounded-md border transition-all duration-200
+                ${!isLoggedIn 
+                  ? 'bg-amber-50 border-amber-200' 
+                  : 'bg-green-50 border-green-200'
+                }
+              `}>
+                <p className={`
+                  text-sm text-center font-medium
+                  ${!isLoggedIn ? 'text-amber-700' : 'text-green-700'}
+                `}>
+                  {!isLoggedIn 
+                    ? '⚠️ Vui lòng đăng nhập để tiếp tục thanh toán'
+                    : '✅ Sẵn sàng thanh toán - Nhấn để tiến hành'
+                  }
+                </p>
+              </div>
             </div>
           )}
         </div>
