@@ -52,7 +52,7 @@ export default function CartModal({
     <>
       {/* Backdrop với hiệu ứng mờ đúng cách */}
       <div
-        className="fixed inset-0 z-40 bg-black/30 backdrop-blur transition-opacity duration-300"
+        className="fixed inset-0 z-40 bg-black/15 backdrop-blur transition-opacity duration-300"
         style={{ backdropFilter: 'blur(2px)' }}
         onClick={onClose}
         aria-hidden="true"
