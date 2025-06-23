@@ -26,9 +26,10 @@ export default function CartModal({
   const isLoggedIn = isAuthenticated();
 
   const getImageSrc = (image?: string | File) => {
-    if (!image) return "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg";
-    return image instanceof File 
-      ? URL.createObjectURL(image) 
+    if (!image)
+      return "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg";
+    return image instanceof File
+      ? URL.createObjectURL(image)
       : `${API_URL}${image}`;
   };
 
@@ -50,14 +51,15 @@ export default function CartModal({
   return (
     <>
       {/* Backdrop với hiệu ứng mờ đúng cách */}
-      <div 
-        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+      <div
+        className="fixed inset-0 z-40 bg-black/50 backdrop-blur transition-opacity duration-300"
+        style={{ backdropFilter: 'blur(2px)' }}
         onClick={onClose}
         aria-hidden="true"
       />
-      
+
       {/* Modal content */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center pt-16 p-4">
         <div
           className={`
             relative bg-white rounded-lg shadow-xl
@@ -123,7 +125,9 @@ export default function CartModal({
 
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity - 1)
+                        }
                         className="p-1 hover:bg-gray-200 rounded-full transition-colors"
                         disabled={item.quantity <= 1}
                         aria-label="Giảm số lượng"
@@ -136,7 +140,9 @@ export default function CartModal({
                       </span>
 
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity + 1)
+                        }
                         className="p-1 hover:bg-gray-200 rounded-full transition-colors"
                         disabled={item.quantity >= item.product.stock}
                         aria-label="Tăng số lượng"
@@ -183,11 +189,13 @@ export default function CartModal({
                 <span>Thanh toán</span>
               </button>
 
-              <div className={`mt-3 p-3 rounded-md border ${
-                !isLoggedIn 
-                  ? "bg-amber-50 border-amber-200 text-amber-700" 
-                  : "bg-green-50 border-green-200 text-green-700"
-              }`}>
+              <div
+                className={`mt-3 p-3 rounded-md border ${
+                  !isLoggedIn
+                    ? "bg-amber-50 border-amber-200 text-amber-700"
+                    : "bg-green-50 border-green-200 text-green-700"
+                }`}
+              >
                 <p className="text-sm text-center font-medium">
                   {!isLoggedIn
                     ? "⚠️ Vui lòng đăng nhập để tiếp tục thanh toán"
