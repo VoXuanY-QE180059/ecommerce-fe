@@ -63,7 +63,7 @@ export default function CartModal({
         <div
           className={`
             relative bg-white rounded-lg shadow-xl
-            w-full max-w-[50vw] max-h-[60vh]
+            w-full max-w-[75vw] max-h-[40vh]
             md:max-w-2xl
             transform transition-all duration-300 ease-out
             ${isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95"}
