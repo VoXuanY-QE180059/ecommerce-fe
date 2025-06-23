@@ -58,12 +58,12 @@ export default function CartModal({
         aria-hidden="true"
       />
 
-      {/* Modal content, */}
+      {/* Modal content */}
       <div className="fixed inset-0 z-50 flex items-center justify-center pt-16 p-4">
         <div
           className={`
             relative bg-white rounded-lg shadow-xl
-            w-full max-w-[75vw] max-h-[60vh]
+            w-full max-w-[85vw] max-h-[75vh]
             md:max-w-2xl
             transform transition-all duration-300 ease-out
             ${isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95"}
