@@ -25,16 +25,11 @@ export default function CartModal({
   } = useCart();
   const isLoggedIn = isAuthenticated();
 
-  if (!isOpen) return null;
-
   const getImageSrc = (image?: string | File) => {
-    if (image instanceof File) {
-      return URL.createObjectURL(image);
-    }
-    if (typeof image === "string" && image) {
-      return `${API_URL}${image}`;
-    }
-    return "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg";
+    if (!image) return "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg";
+    return image instanceof File 
+      ? URL.createObjectURL(image) 
+      : `${API_URL}${image}`;
   };
 
   const handleCheckout = () => {
@@ -42,54 +37,58 @@ export default function CartModal({
       alert("Vui lòng đăng nhập để thực hiện thanh toán!");
       return;
     }
+    if (cartItems.length === 0) {
+      alert("Giỏ hàng trống!");
+      return;
+    }
     onProceedToOrder();
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+    <>
+      {/* Backdrop với hiệu ứng mờ đúng cách */}
+      <div 
+        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
         onClick={onClose}
+        aria-hidden="true"
       />
-
-      {/* Modal với animation fade-in từ dưới lên */}
-      <div
-        className={`
-        relative bg-white rounded-lg shadow-2xl 
-        w-full max-w-[70vw] max-h-[80vh] 
-        sm:max-w-lg md:max-w-xl
-        transform transition-all duration-300 ease-out
-        ${
-          isOpen
-            ? "opacity-100 translate-y-0 scale-100"
-            : "opacity-0 translate-y-5 scale-95"
-        }
-        flex flex-col overflow-hidden
-      `}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-          <div className="flex items-center space-x-2">
-            <ShoppingBag className="w-6 h-6 text-gray-700" />
-            <h2 className="text-lg font-semibold text-gray-900">
-              Giỏ hàng ({getTotalItems()})
-            </h2>
+      
+      {/* Modal content */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          className={`
+            relative bg-white rounded-lg shadow-xl
+            w-full max-w-[90vw] max-h-[85vh]
+            md:max-w-2xl
+            transform transition-all duration-300 ease-out
+            ${isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95"}
+            flex flex-col overflow-hidden
+          `}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+            <div className="flex items-center space-x-2">
+              <ShoppingBag className="w-6 h-6 text-gray-700" />
+              <h2 className="text-lg font-semibold text-gray-900">
+                Giỏ hàng ({getTotalItems()})
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Đóng giỏ hàng"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
 
-        {/* Content */}
-        <div className="flex flex-col flex-1 min-h-0">
-          {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto p-4">
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto">
             {cartItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+              <div className="flex flex-col items-center justify-center h-64 text-gray-500 p-4">
                 <ShoppingBag className="w-16 h-16 mb-4 text-gray-300" />
                 <p className="text-lg font-medium">Giỏ hàng trống</p>
                 <p className="text-sm text-center mt-2">
@@ -97,20 +96,19 @@ export default function CartModal({
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 p-4">
                 {cartItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center space-x-3 bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                    className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    {/* Product Image */}
                     <img
                       src={getImageSrc(item.product.image)}
                       alt={item.product.name}
-                      className="w-16 h-16 object-cover rounded-md"
+                      className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+                      loading="lazy"
                     />
 
-                    {/* Product Info */}
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium text-gray-900 truncate">
                         {item.product.name}
@@ -123,14 +121,12 @@ export default function CartModal({
                       </p>
                     </div>
 
-                    {/* Quantity Controls */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2">
                       <button
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
-                        }
-                        className="p-1 hover:bg-gray-200 rounded-full transition-colors duration-200"
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className="p-1 hover:bg-gray-200 rounded-full transition-colors"
                         disabled={item.quantity <= 1}
+                        aria-label="Giảm số lượng"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
@@ -140,18 +136,18 @@ export default function CartModal({
                       </span>
 
                       <button
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
-                        }
-                        className="p-1 hover:bg-gray-200 rounded-full transition-colors duration-200"
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="p-1 hover:bg-gray-200 rounded-full transition-colors"
                         disabled={item.quantity >= item.product.stock}
+                        aria-label="Tăng số lượng"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
 
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="p-1 hover:bg-red-100 rounded-full transition-colors duration-200 text-red-500"
+                        className="p-1 hover:bg-red-100 rounded-full transition-colors text-red-500"
+                        aria-label="Xóa sản phẩm"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -162,53 +158,37 @@ export default function CartModal({
             )}
           </div>
 
-          {/* Footer - Luôn hiển thị khi có sản phẩm */}
+          {/* Footer */}
           {cartItems.length > 0 && (
-            <div className="border-t border-gray-200 p-4 bg-white">
-              {/* Total */}
+            <div className="border-t border-gray-200 p-4 bg-white sticky bottom-0">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-lg font-semibold text-gray-900">
-                  Tổng cộng:
-                </span>
+                <span className="text-lg font-semibold">Tổng cộng:</span>
                 <span className="text-lg font-bold text-green-600">
                   ₫{getTotalPrice().toFixed(2)}
                 </span>
               </div>
 
-              {/* Checkout Button - Luôn hiển thị với design nhất quán */}
               <button
                 onClick={handleCheckout}
                 className="w-full py-3 px-4 rounded-lg font-semibold text-white
-                  bg-gradient-to-r from-blue-600 to-blue-700 
-                  hover:from-blue-700 hover:to-blue-800
-                  active:from-blue-800 active:to-blue-900
-                  shadow-lg hover:shadow-xl 
-                  transform hover:-translate-y-0.5 active:translate-y-0
-                  transition-all duration-200 ease-out
-                  flex items-center justify-center space-x-2
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                bg-gradient-to-r from-blue-600 to-blue-700 
+                hover:from-blue-700 hover:to-blue-800
+                active:from-blue-800 active:to-blue-900
+                shadow hover:shadow-md 
+                transition-all duration-200
+                flex items-center justify-center gap-2
+                focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <CreditCard className="w-5 h-5" />
                 <span>Thanh toán</span>
               </button>
 
-              {/* Thông báo trạng thái - Luôn hiển thị */}
-              <div
-                className={`
-                mt-3 p-3 rounded-md border transition-all duration-200
-                ${
-                  !isLoggedIn
-                    ? "bg-amber-50 border-amber-200"
-                    : "bg-green-50 border-green-200"
-                }
-              `}
-              >
-                <p
-                  className={`
-                  text-sm text-center font-medium
-                  ${!isLoggedIn ? "text-amber-700" : "text-green-700"}
-                `}
-                >
+              <div className={`mt-3 p-3 rounded-md border ${
+                !isLoggedIn 
+                  ? "bg-amber-50 border-amber-200 text-amber-700" 
+                  : "bg-green-50 border-green-200 text-green-700"
+              }`}>
+                <p className="text-sm text-center font-medium">
                   {!isLoggedIn
                     ? "⚠️ Vui lòng đăng nhập để tiếp tục thanh toán"
                     : "✅ Sẵn sàng thanh toán - Nhấn để tiến hành"}
@@ -218,6 +198,6 @@ export default function CartModal({
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
