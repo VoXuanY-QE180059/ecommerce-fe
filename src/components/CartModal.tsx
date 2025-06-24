@@ -198,8 +198,8 @@ export default function CartModal({
               >
                 <p className="text-sm text-center font-medium">
                   {!isLoggedIn
-                    ? "⚠️ Vui lòng đăng nhập để tiếp tục thanh toán"
-                    : "✅ Sẵn sàng thanh toán - Nhấn để tiến hành"}
+                    ? "⚠️ Vui lòng đăng nhập để tiếp tục đặt hàng"
+                    : "✅ Sẵn sàng đặt hàng - Nhấn để tiến hành"}
                 </p>
               </div>
             </div>
