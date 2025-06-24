@@ -186,7 +186,7 @@ export default function CartModal({
                 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <CreditCard className="w-5 h-5" />
-                <span>Thanh toán</span>
+                <span>Đặt hàng</span>
               </button>
 
               <div
