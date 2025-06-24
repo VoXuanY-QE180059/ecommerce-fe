@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Clock, CheckCircle, XCircle, Truck, AlertCircle, X } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, Truck, AlertCircle, X, ChevronDown, ChevronUp } from 'lucide-react';
+
 import { getOrderHistory, cancelOrder } from '../services/orderApi';
 
 interface OrderProduct {
@@ -26,6 +27,7 @@ const OrderHistoryPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchOrderHistory();
@@ -58,7 +60,6 @@ const OrderHistoryPage: React.FC = () => {
       const response = await cancelOrder(orderId);
       
       if (response.success) {
-        // Cập nhật trạng thái đơn hàng trong state
         setOrders(prevOrders => 
           prevOrders.map(order => 
             order.orderId === orderId 
@@ -75,6 +76,18 @@ const OrderHistoryPage: React.FC = () => {
     } finally {
       setCancellingOrderId(null);
     }
+  };
+
+  const toggleOrderExpansion = (orderId: string) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
   };
 
   const getStatusIcon = (status: string) => {
@@ -114,17 +127,17 @@ const OrderHistoryPage: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
       case 'confirmed':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'shipping':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-50 text-orange-700 border-orange-200';
       case 'completed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-50 text-green-700 border-green-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-50 text-red-700 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
@@ -180,9 +193,9 @@ const OrderHistoryPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-6 max-w-5xl">
         <div className="flex items-center mb-6">
-          <Package className="w-7 h-7 text-green-500 mr-3" />
+          <Package className="w-6 h-6 text-green-500 mr-3" />
           <h1 className="text-2xl font-bold text-gray-800">Lịch sử đơn hàng</h1>
         </div>
 
@@ -193,103 +206,111 @@ const OrderHistoryPage: React.FC = () => {
             <p className="text-gray-500">Bạn chưa có đơn hàng nào. Hãy mua sắm ngay!</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {orders.map((order) => (
-              <div key={order.orderId} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div key={order.orderId} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+                {/* Compact Header */}
                 <div className="p-4">
-                  {/* Header - Compact */}
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-base font-semibold text-gray-800">
-                        #{order.orderId.slice(-8)}
-                      </h3>
-                      <span className="text-sm text-gray-500">
-                        {formatDate(order.createdAt)}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between sm:justify-end gap-3">
-                      <div className="flex items-center">
-                        {getStatusIcon(order.status)}
-                        <span className={`ml-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                  <div className="flex items-center justify-between">
+                    {/* Left side - Order info */}
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-gray-900 text-lg">
+                          #{order.orderId.slice(-8)}
+                        </span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                           {getStatusText(order.status)}
                         </span>
                       </div>
-                      {canCancelOrder(order.status) && (
+                      <div className="hidden sm:flex items-center text-sm text-gray-500">
+                        {formatDate(order.createdAt)}
+                      </div>
+                    </div>
+
+                    {/* Right side - Price and actions */}
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="text-sm text-gray-500">
+                          {order.products.length} sản phẩm
+                        </div>
+                        <div className="text-lg font-bold text-green-600">
+                          {formatCurrency(order.totalAmount)}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 ml-2">
+                        {canCancelOrder(order.status) && (
+                          <button
+                            onClick={() => handleCancelOrder(order.orderId)}
+                            disabled={cancellingOrderId === order.orderId}
+                            className="flex items-center px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {cancellingOrderId === order.orderId ? (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b border-red-600 mr-1"></div>
+                                Hủy đơn
+                              </>
+                            ) : (
+                              <>
+                                <X className="w-3 h-3 mr-1" />
+                                Hủy đơn
+                              </>
+                            )}
+                          </button>
+                        )}
+                        
                         <button
-                          onClick={() => handleCancelOrder(order.orderId)}
-                          disabled={cancellingOrderId === order.orderId}
-                          className="flex items-center px-3 py-1 text-xs text-red-600 border border-red-300 rounded hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => toggleOrderExpansion(order.orderId)}
+                          className="flex items-center px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                         >
-                          {cancellingOrderId === order.orderId ? (
-                            <>
-                              <div className="animate-spin rounded-full h-3 w-3 border-b border-red-600 mr-1"></div>
-                              Đang hủy...
-                            </>
+                          Chi tiết
+                          {expandedOrders.has(order.orderId) ? (
+                            <ChevronUp className="w-3 h-3 ml-1" />
                           ) : (
-                            <>
-                              <X className="w-3 h-3 mr-1" />
-                              Hủy đơn
-                            </>
+                            <ChevronDown className="w-3 h-3 ml-1" />
                           )}
                         </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Content - Professional Layout */}
-                  <div className="border-t border-gray-100 pt-3 mt-3">
-                    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
-                      {/* Left: Order Info */}
-                      <div className="flex-1 space-y-2">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                          <div>
-                            <div className="text-xs text-gray-500 mb-1">Địa chỉ giao hàng</div>
-                            <div className="text-gray-800 font-medium">{order.shippingAddress}</div>
-                          </div>
-                          <div>
-                            <div className="text-xs text-gray-500 mb-1">Số điện thoại</div>
-                            <div className="text-gray-800 font-medium">{order.phoneNumber}</div>
-                          </div>
-                        </div>
-                        {order.notes && (
-                          <div className="text-sm">
-                            <div className="text-xs text-gray-500 mb-1">Ghi chú</div>
-                            <div className="text-gray-700">{order.notes}</div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Right: Price Summary */}
-                      <div className="flex-shrink-0 text-right lg:text-right">
-                        <div className="bg-gray-50 rounded-lg p-3 min-w-[140px]">
-                          <div className="text-xs text-gray-500 mb-1">
-                            {order.products.length} sản phẩm
-                          </div>
-                          <div className="text-xl font-bold text-green-600">
-                            {formatCurrency(order.totalAmount)}
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Products Summary - Collapsed by default */}
-                  <details className="mt-3">
-                    <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 font-medium">
-                      Chi tiết sản phẩm ({order.products.length} món)
-                    </summary>
-                    <div className="mt-2 pt-2 border-t border-gray-100">
-                      <div className="space-y-1">
-                        {order.products.map((product, index) => (
-                          <div key={index} className="flex justify-between text-sm text-gray-600">
-                            <span>Sản phẩm #{product.productId} x{product.quantity}</span>
-                            <span>{formatCurrency(product.price * product.quantity)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </details>
+                  {/* Mobile date */}
+                  <div className="sm:hidden mt-2 text-sm text-gray-500">
+                    {formatDate(order.createdAt)}
+                  </div>
                 </div>
+
+                {/* Expandable Content */}
+                {expandedOrders.has(order.orderId) && (
+                  <div className="border-t border-gray-100 p-4 bg-gray-50">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Thông tin giao hàng</h4>
+                        <div className="space-y-1 text-sm text-gray-600">
+                          <div><strong>Địa chỉ:</strong> {order.shippingAddress}</div>
+                          <div><strong>Số điện thoại:</strong> {order.phoneNumber}</div>
+                          {order.notes && <div><strong>Ghi chú:</strong> {order.notes}</div>}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Chi tiết sản phẩm</h4>
+                        <div className="space-y-1">
+                          {order.products.map((product, index) => (
+                            <div key={index} className="flex justify-between text-sm text-gray-600">
+                              <span>Sản phẩm #{product.productId} × {product.quantity}</span>
+                              <span className="font-medium">{formatCurrency(product.price * product.quantity)}</span>
+                            </div>
+                          ))}
+                          <div className="flex justify-between font-semibold text-gray-800 pt-2 border-t border-gray-200">
+                            <span>Tổng cộng:</span>
+                            <span className="text-green-600">{formatCurrency(order.totalAmount)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
