@@ -35,7 +35,7 @@ export default function CartModal({
 
   const handleCheckout = () => {
     if (!isLoggedIn) {
-      alert("Vui lòng đăng nhập để thực hiện thanh toán!");
+      alert("Vui lòng đăng nhập để thực hiện đặt hàng!");
       return;
     }
     if (cartItems.length === 0) {
