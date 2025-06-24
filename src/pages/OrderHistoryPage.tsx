@@ -236,35 +236,39 @@ const OrderHistoryPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Content - Compact Grid */}
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
-                    {/* Shipping Info */}
-                    <div className="lg:col-span-2">
-                      <div className="flex flex-col sm:flex-row sm:gap-6 gap-2">
-                        <div className="flex-1">
-                          <span className="font-medium text-gray-700">Địa chỉ:</span>
-                          <span className="ml-2 text-gray-600">{order.shippingAddress}</span>
+                  {/* Content - Professional Layout */}
+                  <div className="border-t border-gray-100 pt-3 mt-3">
+                    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+                      {/* Left: Order Info */}
+                      <div className="flex-1 space-y-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">Địa chỉ giao hàng</div>
+                            <div className="text-gray-800 font-medium">{order.shippingAddress}</div>
+                          </div>
+                          <div>
+                            <div className="text-xs text-gray-500 mb-1">Số điện thoại</div>
+                            <div className="text-gray-800 font-medium">{order.phoneNumber}</div>
+                          </div>
                         </div>
-                        <div className="flex-shrink-0">
-                          <span className="font-medium text-gray-700">SĐT:</span>
-                          <span className="ml-2 text-gray-600">{order.phoneNumber}</span>
-                        </div>
+                        {order.notes && (
+                          <div className="text-sm">
+                            <div className="text-xs text-gray-500 mb-1">Ghi chú</div>
+                            <div className="text-gray-700">{order.notes}</div>
+                          </div>
+                        )}
                       </div>
-                      {order.notes && (
-                        <div className="mt-2">
-                          <span className="font-medium text-gray-700">Ghi chú:</span>
-                          <span className="ml-2 text-gray-600">{order.notes}</span>
-                        </div>
-                      )}
-                    </div>
 
-                    {/* Total Amount */}
-                    <div className="flex flex-col items-start lg:items-end">
-                      <div className="text-xs text-gray-500 mb-1">
-                        {order.products.length} sản phẩm
-                      </div>
-                      <div className="text-lg font-bold text-green-600">
-                        {formatCurrency(order.totalAmount)}
+                      {/* Right: Price Summary */}
+                      <div className="flex-shrink-0 text-right lg:text-right">
+                        <div className="bg-gray-50 rounded-lg p-3 min-w-[140px]">
+                          <div className="text-xs text-gray-500 mb-1">
+                            {order.products.length} sản phẩm
+                          </div>
+                          <div className="text-xl font-bold text-green-600">
+                            {formatCurrency(order.totalAmount)}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
