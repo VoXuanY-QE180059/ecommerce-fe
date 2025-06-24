@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OrderPage from './pages/OrderPage';
+import OrderHistoryPage from './pages/OrderHistoryPage';
 import ProductDetail from './components/ProductDetail';
 import ProductForm from './components/ProductForm';
 import DeleteModal from './components/DeleteModal';
@@ -52,6 +53,12 @@ export default function App() {
 
   const navigateTo = (page: string, product: Product | null = null) => {
     if (page === 'form' && !isAuthenticated()) {
+      setCurrentPage('login');
+      return;
+    }
+
+    // Kiểm tra đăng nhập cho trang orders (lịch sử đơn hàng)
+    if (page === 'orders' && !isAuthenticated()) {
       setCurrentPage('login');
       return;
     }
@@ -189,6 +196,11 @@ export default function App() {
         <OrderPage
           navigateTo={navigateTo}
         />
+      )}
+
+      {/* Thêm trang lịch sử đơn hàng */}
+      {currentPage === 'orders' && (
+        <OrderHistoryPage />
       )}
 
       {currentPage === 'detail' && selectedProduct && (
